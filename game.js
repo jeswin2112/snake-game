@@ -13,7 +13,7 @@ class SnakeGame {
         this.food = this.generateFood();
         this.direction = 'right';
         this.score = 0;
-        this.highScore = localStorage.getItem('snakeHighScore') || 0;
+        this.highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
         this.gameOver = false;
         this.isPaused = false; // Add pause state
         
@@ -193,7 +193,7 @@ class SnakeGame {
             
             if (this.score > this.highScore) {
                 this.highScore = this.score;
-                localStorage.setItem('snakeHighScore', this.highScore);
+                localStorage.setItem('snakeHighScore', this.highScore.toString());
             }
         }
     }
