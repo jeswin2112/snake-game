@@ -7,6 +7,7 @@
     "start": "live-server",
     "deploy": "gh-pages -d ."
   },
+  "homepage": "https://jeswin2112.github.io/snake-game/",
   "keywords": [
     "snake",
     "game",
