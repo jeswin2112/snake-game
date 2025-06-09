@@ -1,0 +1,21 @@
+{
+  "name": "snake-game",
+  "version": "1.0.0",
+  "description": "Classic Snake Game",
+  "main": "game.js",
+  "scripts": {
+    "start": "live-server",
+    "deploy": "gh-pages -d ."
+  },
+  "homepage": "https://jeswin2112.github.io/snake-game/",
+  "keywords": [
+    "snake",
+    "game",
+    "javascript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
+  }
+}
