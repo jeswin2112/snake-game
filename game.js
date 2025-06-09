@@ -22,6 +22,20 @@ class SnakeGame {
     }
 
     setupEventListeners() {
+        // Add touch control handlers
+        document.getElementById('touch-up').addEventListener('click', () => {
+            if (this.direction !== 'down') this.direction = 'up';
+        });
+        document.getElementById('touch-down').addEventListener('click', () => {
+            if (this.direction !== 'up') this.direction = 'down';
+        });
+        document.getElementById('touch-left').addEventListener('click', () => {
+            if (this.direction !== 'right') this.direction = 'left';
+        });
+        document.getElementById('touch-right').addEventListener('click', () => {
+            if (this.direction !== 'left') this.direction = 'right';
+        });
+
         // Add speed slider handler
         const speedSlider = document.getElementById('speedSlider');
         const speedValue = document.getElementById('speedValue');
@@ -36,6 +50,11 @@ class SnakeGame {
             this.isPaused = !this.isPaused;
             document.getElementById('pauseButton').textContent = this.isPaused ? 'Resume' : 'Pause';
         });
+
+        // Add touch controls for mobile devices
+        if ('ontouchstart' in window) {
+            document.getElementById('touch-controls').style.display = 'flex';
+        }
 
         document.addEventListener('keydown', (e) => {
             if (this.gameOver) return;
@@ -118,18 +137,7 @@ class SnakeGame {
             case 'right': head.x += 1; break;
         }
 
-        // Check for wall collision
-        if (head.x < 0 || head.x >= this.canvas.width / this.gridSize ||
-            head.y < 0 || head.y >= this.canvas.height / this.gridSize) {
-            this.gameOver = true;
-            return;
-        }
-
-        // Check for self collision
-        if (this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-            this.gameOver = true;
-            return;
-        }
+        this.checkCollision();
 
         this.snake.unshift(head);
 
@@ -143,10 +151,27 @@ class SnakeGame {
         }
     }
 
+    checkCollision() {
+        // Check wall collision
+        const head = this.snake[0];
+        if (head.x < 0 || head.x >= this.canvas.width / this.gridSize ||
+            head.y < 0 || head.y >= this.canvas.height / this.gridSize) {
+            this.gameOver = true;
+            return;
+        }
+
+        // Check self collision
+        for (let i = 1; i < this.snake.length; i++) {
+            if (head.x === this.snake[i].x && head.y === this.snake[i].y) {
+                this.gameOver = true;
+                return;
+            }
+        }
+    }
+
     draw() {
         this.ctx.fillStyle = '#fff';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
         // Draw food
         this.ctx.fillStyle = '#ff0000';
         this.ctx.fillRect(
@@ -155,11 +180,9 @@ class SnakeGame {
             this.gridSize - 2,
             this.gridSize - 2
         );
-
-        // Draw snake
+        // Draw snake with pulsing effect
         this.ctx.fillStyle = '#000';
         this.snake.forEach((segment, index) => {
-            // Add pulsing effect to snake segments
             const pulse = Math.sin(Date.now() / 100 + index * 10) * 2;
             this.ctx.fillRect(
                 segment.x * this.gridSize + pulse,
@@ -168,32 +191,17 @@ class SnakeGame {
                 this.gridSize - 2 - pulse
             );
         });
-
         if (this.gameOver) {
-            // Create game over message element if it doesn't exist
             let gameOverElement = document.querySelector('.game-over');
             if (!gameOverElement) {
                 gameOverElement = document.createElement('div');
                 gameOverElement.className = 'game-over';
                 gameOverElement.textContent = 'Game Over!';
                 document.body.appendChild(gameOverElement);
-            }
-            
-            // Add explode animation class to snake segments
-            this.ctx.fillStyle = '#ff0000';
-            this.snake.forEach(segment => {
-                const rect = this.ctx.fillRect(
-                    segment.x * this.gridSize,
-                    segment.y * this.gridSize,
-                    this.gridSize - 2,
-                    this.gridSize - 2
-                );
-                rect.classList.add('snake-dead');
-            });
-            
-            if (this.score > this.highScore) {
-                this.highScore = this.score;
-                localStorage.setItem('snakeHighScore', this.highScore.toString());
+                if (this.score > this.highScore) {
+                    this.highScore = this.score;
+                    localStorage.setItem('snakeHighScore', this.highScore.toString());
+                }
             }
         }
     }
